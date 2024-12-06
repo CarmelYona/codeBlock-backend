@@ -22,10 +22,11 @@ async function query() {
     }
 }
 
-async function getByUsername(username) {
+async function getByUsername(username, password) {
     try {
         const collection = await dbService.getCollection('user')
         const user = await collection.findOne({ username })
+        if (user.password != password) return null
         return user
     } catch (err) {
         logger.error(`while finding user ${username}`, err)

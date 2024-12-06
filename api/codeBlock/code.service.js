@@ -5,7 +5,9 @@ const ObjectId = require('mongodb').ObjectId
 module.exports = {
     query,
     getById,
-    update
+    update,
+    add,
+    remove
 }
 
 const collectionName = 'codeBlock'
@@ -28,7 +30,7 @@ async function getById(codeBlockId) {
         const codeBlock = collection.findOne({ _id: ObjectId(codeBlockId) })
         return codeBlock
     } catch (err) {
-        logger.error('***********cannot find code', err)
+        logger.error('***********cannot find codeBlock', err)
         throw err
     }
 }
@@ -41,7 +43,27 @@ async function update(codeBlock) {
         await collection.updateOne({ _id: id }, { $set: { ...codeBlock } })
         return codeBlock
     } catch (err) {
-        logger.error(`cannot update board ${boardId}`, err)
+        logger.error(`cannot update codeBlock ${boardId}`, err)
         throw err
+    }
+}
+
+async function add(codeBlock) {
+    try {
+        const collection = await dbService.getCollection(collectionName)
+        const code = await collection.insertOne(codeBlock)
+        return code.ops[0]._id ? true : false
+    } catch (err) {
+        logger.error(`cannot add codeBlock`, err)
+        throw err
+    }
+}
+
+async function remove(id) {
+    try {
+        const collection = await dbService.getCollection(collectionName)
+        await collection.deleteOne({ _id: ObjectId(id) })
+    } catch (err) {
+        logger.error(`cannot remove codeBlock`, err)
     }
 }
